@@ -1,0 +1,118 @@
+snippet ifelse
+options head
+  if ${1:#:condition} then
+    ${0:TARGET}
+  else
+  end
+
+snippet xdump
+options word
+    dump(${1:-- name},"$1",10)
+
+snippet xprint
+options word
+    print("${1:-- name}",$1)
+
+snippet xfc
+options word
+	function `bufname('%') ==#'[Command Line]' ? expand('#:t:r:r:r') : expand('%:t:r:r:r')`:${1:mname}(${2:})
+		${0:TARGET}
+	end
+
+snippet xfhandle
+options word
+    function `bufname('%') ==#'[Command Line]' ? expand('#:t:r:r:r') : expand('%:t:r:r:r')`:${1:msgName}(target,data)
+            ${0:TARGET}
+    end
+
+snippet xfmsg
+options word
+    SoraDAddMessage(self,"${1:msgtype}",handler(self,self.${0:msgfun}))
+
+snippet xfmsghandle
+options word
+    function `bufname('%') ==#'[Command Line]' ? expand('#:t:r:r:r') : expand('%:t:r:r:r')`:${1:msgName}(button,type)
+        if type == ccui.TouchEventType.ended then
+            SoraDPlaySound()
+            ${0:TARGET}
+        end
+    end
+
+snippet xbtitle
+options word
+	self.${1:nodeTitle} = SoraDGetExtendChildFromCCSByName(self,"CCS_commonFramTitle_${0:title}")
+
+snippet xbtxt
+options word
+	self.txt_${1:name} = SoraDGetChildByName(self,"Text_${0:title}")
+
+snippet xbbtn
+options word
+	self.btn_${1:name} = SoraDGetChildByName(self,"Button_${0:title}")
+
+snippet xsstring
+options word
+	self.${1:name}:setString(i18n("${2:common_text_}#{0}"))
+
+snippet xtitle
+options word
+    --
+    -- Author: yubin
+    -- Date `strftime("%Y-%m-%d %H:%M:%S")`
+    --
+    --[[
+        ${0}
+    ]]
+
+snippet xfile
+options word
+    --
+    -- Author: yubin
+    -- Date `strftime("%Y-%m-%d %H:%M:%S")`
+    --
+    --[[
+        ${0:#:file des}
+    ]]
+
+    local gametop = gModuleMgr.getObject("gametop")
+
+    -- 全局变量
+
+    --创造接口
+    local ${1:`bufname('%') ==#'[Command Line]' ? expand('#:t:r:r:r') : expand('%:t:r:r:r')`} = class("$1",function(target)
+        --加载自己的相应的ccsfile
+        if target == nil then
+            return SoraDCreateBasePanel("$1")
+        end
+        return target
+    end)
+
+    --入口
+    function $1:ctor()
+        --自己弹出后，隐藏场景和主UI
+        self.isHideCurrentSceneView = true
+
+        -- 引用文件
+        -- self.nodeTitle = SoraDGetExtendChildFromCCSByName(self,"CCS_commonFramTitle_title")
+
+        -- self.btnQuickChoose = SoraDGetChildByName(self, "Button_quick")
+        -- self.btnQuickChoose:setTitleText(i18n("common_text_852"))
+
+
+        -- self.labelNotice = SoraDGetChildByName(self, "Text_notice")
+        -- self.labelNotice:setString(i18n("common_text_858"))
+    end
+
+    --注册事件监听
+    function $1:onMessageListener()
+        -- SoraDAddMessage(self,"MESSAGE_ALLIANCE_CREATE_ERR_BACK",handler(self, self.teamInputErr))
+    end
+
+    --事件响应
+    function $1:btnQuickClickCallBack(button,type)
+        if type == ccui.TouchEventType.ended then
+            SoraDPlaySound()
+        end
+    end
+
+    return $1
