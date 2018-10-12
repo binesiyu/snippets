@@ -97,6 +97,7 @@ options word
 
         -- self.btnQuickChoose = SoraDGetChildByName(self, "Button_quick")
         -- self.btnQuickChoose:setTitleText(i18n("common_text_852"))
+	    -- self.btnQuickChoose:addTouchEventListener(handler(self,self.btnQuickClickCallBack))
 
 
         -- self.labelNotice = SoraDGetChildByName(self, "Text_notice")
@@ -115,4 +116,96 @@ options word
         end
     end
 
+    return $1
+
+snippet xnode
+options word
+    --
+    -- Author: yubin
+    -- Date `strftime("%Y-%m-%d %H:%M:%S")`
+    --
+    --[[
+        ${0:#:file des}
+    ]]
+
+    -- 全局变量
+
+    --创造接口
+    local ${1:`bufname('%') ==#'[Command Line]' ? expand('#:t:r:r:r') : expand('%:t:r:r:r')`} = class("$1",function(target)
+        --加载自己的相应的ccsfile
+        if target == nil then
+            return SoraDCreateBasePanel("$1")
+        end
+        return target
+    end)
+
+    --入口
+    function $1:ctor()
+
+        -- self.frame_rank = SoraDGetChildByName(self, "frame_rank")
+        -- self.btnQuickChoose = SoraDGetChildByName(self, "Button_quick")
+        -- self.btnQuickChoose:setTitleText(i18n("common_text_852"))
+	    -- self.btnQuickChoose:addTouchEventListener(handler(self,self.btnQuickClickCallBack))
+
+
+        -- self.labelNotice = SoraDGetChildByName(self, "Text_notice")
+        -- self.labelNotice:setString(i18n("common_text_858"))
+
+        self.tableSingleData = {}
+        self.handle = nil
+        self.scroll = nil
+        self.singleIsMoved = false
+        if self.frame_rank then
+            self.frame_rank:setSwallowTouches(false)
+            self.frame_rank:addTouchEventListener(handler(self,self.btnClickCallBack))
+        end
+    end
+
+    function $1:initData(data)
+    end
+    --事件响应
+    function $1:btnQuickClickCallBack(button,type)
+        if type == ccui.TouchEventType.ended then
+            SoraDPlaySound()
+        end
+    end
+    --按钮点击
+    function $1:btnClickCallBack(button,type)
+        if type == ccui.TouchEventType.ended then
+            if not SoraDIsNodeVisibleOnScroll(button,self.scroll) then
+                print("node is not on view")
+                return
+            end
+
+            if self.singleIsMoved then
+                self.singleIsMoved = false
+                return
+            end
+
+            SoraDPlaySound()
+
+            if self.handle then
+                self.handle(self.tableSingleData)
+            end
+
+        elseif type == ccui.TouchEventType.moved then
+            --判断偏移距离
+            local touchBeganPoint = button:getTouchBeganPosition()
+            local touchmovePoint =  button:getTouchMovePosition()
+            local distance = cc.pGetDistance(touchBeganPoint,touchmovePoint)
+            if tonumber(distance) >TOUCH_MOVED_ERROR_VALUE then
+                --有移动
+                self.singleIsMoved = true
+            end
+        elseif type == ccui.TouchEventType.canceled then
+            self.singleIsMoved = false
+        end
+    end
+    function $1:setScroll(scroll)
+        self.scroll = scroll
+    end
+
+    function $1:setHandle(handle)
+        self.handle = handle
+    end
     return $1
